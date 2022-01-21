@@ -4,26 +4,26 @@ import GuessResult from "./components/GuessResult.vue";
 import Suggestions from "./components/Suggestions.vue";
 
 import { getSuggestions, getUpdatedGameState } from "./utils/guess";
-import { wordList } from "./data/dictionary";
+import { initialSuggestions, wordList } from "./data/dictionary";
 import { KnownLetter, LetterState } from "./types/letters";
 import { ref } from "vue";
 
 const invalidLetters = ref([] as string[]);
-const knownCharacters = ref([] as KnownLetter[]);
+const knownLetters = ref([] as KnownLetter[]);
 const guessResults = ref([] as LetterState[][]);
-const suggestions = ref(wordList);
+const suggestions = ref(initialSuggestions);
 
 const onGuessSubmit = (letterStates: LetterState[]) => {
   const newState = getUpdatedGameState(
     invalidLetters.value,
-    knownCharacters.value,
+    knownLetters.value,
     letterStates
   );
-  knownCharacters.value = newState.knownLetters;
+  knownLetters.value = newState.knownLetters;
   invalidLetters.value = newState.invalidLetters;
   suggestions.value = getSuggestions(
     wordList,
-    knownCharacters.value,
+    knownLetters.value,
     invalidLetters.value
   );
   guessResults.value = [...guessResults.value, [...letterStates]];
@@ -31,13 +31,9 @@ const onGuessSubmit = (letterStates: LetterState[]) => {
 
 const onReset = () => {
   invalidLetters.value = [];
-  knownCharacters.value = [];
+  knownLetters.value = [];
   guessResults.value = [];
-  suggestions.value = getSuggestions(
-    wordList,
-    knownCharacters.value,
-    invalidLetters.value
-  );;
+  suggestions.value = initialSuggestions;
 };
 </script>
 
@@ -49,9 +45,13 @@ const onReset = () => {
       <GuessResult :result="result" :number="index + 1" />
     </li>
   </ol>
-  <div v-if="suggestions.length">
-    <GuessInput @guess-submit="onGuessSubmit" />
+  <div v-if="suggestions.length > 1">
+    <GuessInput :known-letters="knownLetters" @guess-submit="onGuessSubmit" />
     <Suggestions :suggestions="suggestions" />
+  </div>
+  <div v-else-if="suggestions.length === 1">
+    <p class="mb-4">Yay! Today's word is {{ suggestions[0] }}.</p>
+    <button class="default-button" @click="onReset">Start Again</button>
   </div>
   <div v-else>
     <p class="mb-4">

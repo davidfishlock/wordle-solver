@@ -1,4 +1,83 @@
-import { KnownLetter, LetterState } from "../types/letters";
+import { KnownLetter, LetterState, MatchState } from "../types/letters";
+
+const VOWELS = ["a", "e", "i", "o", "u"];
+const VOWEL_SCORE = 10;
+const CONSONANT_SCORE = 5;
+const MAX_SUGGESTIONS_LENGTH = 10;
+
+function isVowel(letter: string) {
+  return VOWELS.some((vowel) => vowel === letter);
+}
+
+function isKnownLetter(letter: string, knownLetters: KnownLetter[]) {
+  return knownLetters.some((knownLetter) => knownLetter.letter === letter);
+}
+
+export function getKnownMatchState(
+  letter: string,
+  knownLetters: KnownLetter[],
+  index: number
+): MatchState {
+  const knownEntry = knownLetters.find(
+    (knownLetter) => knownLetter.letter === letter
+  );
+
+  if (!knownEntry) {
+    return "invalid";
+  }
+
+  if (knownEntry.matches.some((matchIndex) => matchIndex === index)) {
+    return "match";
+  }
+
+  if (knownEntry.partials.some((matchIndex) => matchIndex === index)) {
+    return "partial";
+  }
+
+  return "invalid";
+}
+
+function getSuggestionScore(
+  word: string,
+  knownLetters: KnownLetter[]
+) {
+  const characters = word.split("");
+  const uniqueRemainingVowels = [
+    ...new Set(
+      characters.filter(
+        (character) =>
+          isVowel(character) && !isKnownLetter(character, knownLetters)
+      )
+    ),
+  ];
+  const uniqueRemainingConsonants = [
+    ...new Set(
+      characters.filter(
+        (character) =>
+          !isVowel(character) && !isKnownLetter(character, knownLetters)
+      )
+    ),
+  ];
+
+  return (
+    uniqueRemainingVowels.length * VOWEL_SCORE +
+    uniqueRemainingConsonants.length * CONSONANT_SCORE
+  );
+}
+
+export function getTopScoringSuggestions(
+  words: string[],
+  knownLetters: KnownLetter[]
+) {
+  return words
+    .map((word) => ({
+      word: word,
+      score: getSuggestionScore(word, knownLetters),
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, MAX_SUGGESTIONS_LENGTH)
+    .map((wordWithScore) => wordWithScore.word);
+}
 
 export function getUpdatedGameState(
   invalidLetters: string[],
@@ -67,25 +146,27 @@ export function getSuggestions(
   knownLetters: KnownLetter[],
   invalidLetters: string[]
 ) {
-  const withoutInvalidChars = dictionary.filter((word) =>
+  const withoutInvalidLetters = dictionary.filter((word) =>
     word
       .split("")
       .every(
         (letter) =>
           !invalidLetters.includes(letter) ||
-          knownLetters.some((knownLetter) => knownLetter.letter.toLowerCase() === letter)
+          knownLetters.some(
+            (knownLetter) => knownLetter.letter === letter
+          )
       )
   );
-  const withKnownCharacters = withoutInvalidChars.filter((word) =>
-    knownLetters.every(
-      (knownLetter) => {
-        const normalizedChar = knownLetter.letter.toLowerCase();
-        return word.split("").includes(normalizedChar) &&
-          knownLetter.matches.every((index) => word[index] === normalizedChar) &&
-          knownLetter.partials.every((index) => word[index] !== normalizedChar)
-      }
-    )
+  const withKnownLetters = withoutInvalidLetters.filter((word) =>
+    knownLetters.every((knownLetter) => {
+      const normalizedChar = knownLetter.letter;
+      return (
+        word.split("").includes(normalizedChar) &&
+        knownLetter.matches.every((index) => word[index] === normalizedChar) &&
+        knownLetter.partials.every((index) => word[index] !== normalizedChar)
+      );
+    })
   );
 
-  return withKnownCharacters;
+  return getTopScoringSuggestions(withKnownLetters, knownLetters);
 }

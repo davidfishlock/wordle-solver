@@ -1,3 +1,5 @@
+import { getTopScoringSuggestions } from "../utils/guess";
+
 export const wordList = [
   "cigar",
   "rebut",
@@ -2315,3 +2317,5 @@ export const wordList = [
   "rural",
   "shave",
 ];
+
+export const initialSuggestions = getTopScoringSuggestions(wordList, []);
