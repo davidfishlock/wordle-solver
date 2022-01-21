@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply default-text default-background p-6 sm:p-8;
+    font-family: 'Open Sans', sans-serif;
+  }
+
+  h1 {
+    @apply text-4xl font-bold uppercase tracking-wide;
+  }
+
+  h2 {
+    @apply text-2xl font-medium;
+  }
+
+  /* Colors */
+  .default-background {
+    @apply bg-white dark:bg-gray-800;
+  }
+
+  .invalid {
+    @apply bg-gray-600 dark:bg-gray-600;
+  }
+
+  .partial {
+    @apply bg-yellow-500 dark:bg-yellow-600;
+  }
+
+  .match {
+    @apply bg-green-600 dark:bg-green-600;
+  }
+
+  .default-text {
+    @apply text-gray-900 dark:text-gray-100;
+  }
+
+  .secondary-text {
+    @apply text-gray-900 dark:text-gray-100;
+  }
+
+  .white-text {
+    @apply text-gray-50;
+  }
+}
+
+@layer components {
+  .default-button {
+    @apply white-text bg-blue-500 hover:bg-blue-700 disabled:bg-blue-500 disabled:opacity-50 font-bold tracking-wide uppercase px-6 py-2 rounded-md flex flex-row items-center;
+  }
+
+  .tile-row {
+    @apply flex space-x-2 max-w-lg;
+  }
+
+  .tile {
+    @apply flex w-1/5 aspect-square text-3xl xs:text-4xl sm:text-5xl items-center justify-center text-center white-text uppercase font-bold;
+  }
+}

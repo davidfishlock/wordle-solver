@@ -17,14 +17,14 @@ export function getUpdatedGameState(
     }
 
     const existingKnownLetter = updatedKnownLetters.find(
-      (letter) => letter.char === item.letter
+      (letter) => letter.letter === item.letter
     );
 
     if (!existingKnownLetter) {
       updatedKnownLetters = [
         ...updatedKnownLetters,
         {
-          char: item.letter,
+          letter: item.letter,
           matches: item.state === "match" ? [index] : [],
           partials: item.state === "partial" ? [index] : [],
         },
@@ -33,12 +33,12 @@ export function getUpdatedGameState(
 
     if (existingKnownLetter) {
       const existingIndex = updatedKnownLetters.findIndex(
-        (letter) => letter.char === item.letter
+        (letter) => letter.letter === item.letter
       );
       updatedKnownLetters = [
         ...updatedKnownLetters.slice(0, existingIndex),
         {
-          char: item.letter,
+          letter: item.letter,
           matches:
             item.state === "match"
               ? [...new Set([...existingKnownLetter.matches, index])]
@@ -62,9 +62,9 @@ export function getUpdatedGameState(
   };
 }
 
-export function getPossibleWords(
+export function getSuggestions(
   dictionary: string[],
-  knownCharacters: KnownLetter[],
+  knownLetters: KnownLetter[],
   invalidLetters: string[]
 ) {
   const withoutInvalidChars = dictionary.filter((word) =>
@@ -73,15 +73,17 @@ export function getPossibleWords(
       .every(
         (letter) =>
           !invalidLetters.includes(letter) ||
-          knownCharacters.some((char) => char.char === letter)
+          knownLetters.some((knownLetter) => knownLetter.letter.toLowerCase() === letter)
       )
   );
   const withKnownCharacters = withoutInvalidChars.filter((word) =>
-    knownCharacters.every(
-      (knownChar) =>
-        word.split("").includes(knownChar.char) &&
-        knownChar.matches.every((index) => word[index] === knownChar.char) &&
-        knownChar.partials.every((index) => word[index] !== knownChar.char)
+    knownLetters.every(
+      (knownLetter) => {
+        const normalizedChar = knownLetter.letter.toLowerCase();
+        return word.split("").includes(normalizedChar) &&
+          knownLetter.matches.every((index) => word[index] === normalizedChar) &&
+          knownLetter.partials.every((index) => word[index] !== normalizedChar)
+      }
     )
   );
 

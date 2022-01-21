@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { LetterState } from "../types/letters";
 import LetterInput from "./LetterInput.vue";
+import LetterStateButtons from "./LetterStateButtons.vue";
 
 const defaultLetterState: LetterState = { letter: "", state: "invalid" };
 
@@ -42,25 +43,27 @@ const onSubmit = () => {
 </script>
 
 <template>
-  <div class="root">
-    <div class="inputs">
+  <div class="mb-8">
+    <div class="tile-row mb-2">
       <LetterInput v-model:letter-state="letter1State" />
       <LetterInput v-model:letter-state="letter2State" />
       <LetterInput v-model:letter-state="letter3State" />
       <LetterInput v-model:letter-state="letter4State" />
       <LetterInput v-model:letter-state="letter5State" />
     </div>
-    <button :disabled="!canSubmit" @click="onSubmit">Submit</button>
+
+    <div class="tile-row mb-4">
+      <LetterStateButtons v-model:letter-state="letter1State" />
+      <LetterStateButtons v-model:letter-state="letter2State" />
+      <LetterStateButtons v-model:letter-state="letter3State" />
+      <LetterStateButtons v-model:letter-state="letter4State" />
+      <LetterStateButtons v-model:letter-state="letter5State" />
+    </div>
+
+    <button class="default-button" :disabled="!canSubmit" @click="onSubmit">
+      Submit
+    </button>
   </div>
 </template>
 
-<style scoped>
-.root {
-  margin-bottom: 4px;
-}
-
-.inputs {
-  display: flex;
-  margin-bottom: 4px;
-}
-</style>
+<style scoped></style>

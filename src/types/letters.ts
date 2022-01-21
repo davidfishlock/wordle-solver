@@ -1,7 +1,7 @@
 export type MatchState = "invalid" | "partial" | "match";
 
 export type KnownLetter = {
-  char: string;
+  letter: string;
   matches: number[];
   partials: number[];
 };
