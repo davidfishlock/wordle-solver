@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { KnownLetter, LetterState } from "../types/letters";
+import { KnownLetter, LetterState } from "../types/types";
 import { toRefs } from "vue";
 import { focusNext } from "../utils/focus";
 import { getKnownMatchState } from "../utils/guess";

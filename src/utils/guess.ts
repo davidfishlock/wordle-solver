@@ -1,4 +1,4 @@
-import { KnownLetter, LetterState, MatchState } from "../types/letters";
+import { KnownLetter, LetterState, MatchState } from "../types/types";
 
 export function getKnownMatchState(
   letter: string,

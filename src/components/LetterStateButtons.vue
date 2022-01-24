@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LetterState, MatchState } from "../types/letters";
+import { LetterState, MatchState } from "../types/types";
 import { toRefs } from "vue";
 
 const emit = defineEmits<{

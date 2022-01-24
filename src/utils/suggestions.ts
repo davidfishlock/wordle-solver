@@ -4,13 +4,13 @@ import {
   VOWELS,
   EXACT_MATCH_MULTIPLIER,
 } from "../constants";
-import { KnownLetter } from "../types/letters";
+import { KnownLetter } from "../types/types";
 import { wordList } from "../data/dictionary";
 
 const startingPositionInfo = {
   totalCount: 0,
-  positionCounts: [0,0,0,0,0]
-}
+  positionCounts: [0, 0, 0, 0, 0],
+};
 
 type LetterPositionInfo = typeof startingPositionInfo;
 

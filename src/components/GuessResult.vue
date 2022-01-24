@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LetterState } from "../types/letters";
+import { LetterState } from "../types/types";
 
 defineProps<{ result: LetterState[] }>();
 </script>

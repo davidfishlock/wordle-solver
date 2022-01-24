@@ -5,17 +5,13 @@ import Suggestions from "./components/Suggestions.vue";
 
 import { getUpdatedGameState } from "./utils/guess";
 import { wordList } from "./data/dictionary";
-import { KnownLetter, LetterState } from "./types/letters";
+import { KnownLetter, LetterState, Guess } from "./types/types";
 import { ref } from "vue";
-import {
-  generateWordScores,
-  getSuggestions,
-  initialSuggestions,
-} from "./utils/suggestions";
+import { getSuggestions, initialSuggestions } from "./utils/suggestions";
 
 const invalidLetters = ref([] as string[]);
 const knownLetters = ref([] as KnownLetter[]);
-const guessResults = ref([] as LetterState[][]);
+const guessResults = ref([] as Guess[]);
 const suggestions = ref(initialSuggestions);
 
 const onGuessSubmit = (letterStates: LetterState[]) => {

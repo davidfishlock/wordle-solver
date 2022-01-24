@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { KnownLetter, LetterState } from "../types/letters";
+import { KnownLetter, LetterState } from "../types/types";
 import LetterInput from "./LetterInput.vue";
 import LetterStateButtons from "./LetterStateButtons.vue";
 import { focusNext } from "../utils/focus";
@@ -54,8 +54,8 @@ watch(
     ];
   },
   (newValue, oldValue) => {
-    const oldFilledValues = oldValue.filter(letter => letter);
-    const newFilledValues = newValue.filter(letter => letter);
+    const oldFilledValues = oldValue.filter((letter) => letter);
+    const newFilledValues = newValue.filter((letter) => letter);
     if (newFilledValues.length >= oldFilledValues.length) focusNext();
   },
   {}
