@@ -1,10 +1,5 @@
-import {
-  CONSONANTS,
-  MAX_SUGGESTIONS_LENGTH,
-  VOWELS,
-  EXACT_MATCH_MULTIPLIER,
-} from "../constants";
-import { KnownLetter } from "../types/types";
+import { CONSONANTS, VOWELS, EXACT_MATCH_MULTIPLIER } from "../constants";
+import { Guess } from "../types/types";
 import { wordList } from "../data/dictionary";
 
 const startingPositionInfo = {
@@ -19,7 +14,7 @@ type WordScore = {
   score: number;
 };
 
-export const initialSuggestions = getSuggestions(wordList, [], []);
+export const initialSuggestions = getSuggestions(wordList, []);
 
 function generateLetterScores(words: string[]) {
   const scores: Record<string, LetterPositionInfo> = {
@@ -63,37 +58,46 @@ export function generateWordScores(words: string[]): WordScore[] {
   return wordScores;
 }
 
-function getTopScoringSuggestions(words: string[]) {
-  return generateWordScores(words)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, MAX_SUGGESTIONS_LENGTH)
-    .map((wordScore) => wordScore.word);
+function isValidForGuess(word: string, guess: Guess) {
+  for (const [index, letterState] of guess.entries()) {
+    if (letterState.state === "match" && word[index] !== letterState.letter) {
+      return false;
+    }
+
+    const indicatedCharacterInstancesInGuess = guess.filter(
+      (state) =>
+        state.letter === letterState.letter && state.state !== "invalid"
+    ).length;
+    const characterInstancesInWord = word
+      .split("")
+      .filter((letter) => letter === letterState.letter).length;
+
+    if (
+      letterState.state === "partial" &&
+      (word[index] === letterState.letter ||
+        characterInstancesInWord < indicatedCharacterInstancesInGuess)
+    ) {
+      return false;
+    }
+
+    if (
+      letterState.state === "invalid" &&
+      (word[index] === letterState.letter ||
+        characterInstancesInWord > indicatedCharacterInstancesInGuess)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
-export function getSuggestions(
-  dictionary: string[],
-  knownLetters: KnownLetter[],
-  invalidLetters: string[]
-) {
-  const withoutInvalidLetters = dictionary.filter((word) =>
-    word
-      .split("")
-      .every(
-        (letter) =>
-          !invalidLetters.includes(letter) ||
-          knownLetters.some((knownLetter) => knownLetter.letter === letter)
-      )
-  );
-  const withKnownLetters = withoutInvalidLetters.filter((word) =>
-    knownLetters.every((knownLetter) => {
-      const normalizedChar = knownLetter.letter;
-      return (
-        word.split("").includes(normalizedChar) &&
-        knownLetter.matches.every((index) => word[index] === normalizedChar) &&
-        knownLetter.partials.every((index) => word[index] !== normalizedChar)
-      );
-    })
+export function getSuggestions(remainingWords: string[], guesses: Guess[]) {
+  const candidates = remainingWords.filter((word) =>
+    guesses.every((guess) => isValidForGuess(word, guess))
   );
 
-  return getTopScoringSuggestions(withKnownLetters);
+  return generateWordScores(candidates)
+    .sort((a, b) => b.score - a.score)
+    .map((wordScore) => wordScore.word);
 }

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { KnownLetter, LetterState } from "../types/types";
+import { LetterState } from "../types/types";
 import { toRefs } from "vue";
-import { focusNext } from "../utils/focus";
-import { getKnownMatchState } from "../utils/guess";
 
 const emit = defineEmits<{
   (e: "update:letter-state", state: LetterState): void;
@@ -10,21 +8,14 @@ const emit = defineEmits<{
 
 const props = defineProps<{
   letterState: LetterState;
-  knownLetters: KnownLetter[];
-  index: number;
 }>();
-const { knownLetters, index } = toRefs(props);
+const { letterState } = toRefs(props);
 
 const onLetterChanged = (event: Event) => {
   const newValue = (event.target as HTMLInputElement).value;
-  const matchState = getKnownMatchState(
-    newValue,
-    knownLetters.value,
-    index.value
-  );
   emit("update:letter-state", {
+    ...letterState.value,
     letter: newValue.toLowerCase(),
-    state: matchState,
   });
 };
 </script>

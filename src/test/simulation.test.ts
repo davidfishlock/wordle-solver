@@ -1,17 +1,16 @@
-import { Guess, KnownLetter } from "../types/types";
+import { Guess } from "../types/types";
 import { getSuggestions, initialSuggestions } from "../utils/suggestions";
 import { wordList } from "../data/dictionary";
-import { getUpdatedGameState } from "../utils/guess";
 
-const MAX_GUESSES = 6;
-
-function isExactMatch(targetWord: string, guessWord: string, index: number) {
-  return guessWord[index] === targetWord[index];
-}
+const MAX_GUESSES = 7;
 
 function getGuessResult(targetWord: string, guessWord: string): Guess {
+  function isExactMatch(targetWord: string, guessWord: string, index: number) {
+    return guessWord[index] === targetWord[index];
+  }
+
   // Initialize and apply exact matches
-  const initialStates: Guess = [
+  const states: Guess = [
     {
       letter: guessWord[0],
       state: isExactMatch(targetWord, guessWord, 0) ? "match" : "invalid",
@@ -35,73 +34,78 @@ function getGuessResult(targetWord: string, guessWord: string): Guess {
   ];
 
   // calculate any partial matches
-  const result = initialStates.map((letterState) => {
-    if (letterState.state === "invalid") {
-      const hasPartialCharacterMatches =
-        targetWord
-          .split("")
-          .filter(
-            (char, index) =>
-              char === letterState.letter &&
-              initialStates[index].state !== "match"
-          ).length > 0;
+  const result = states.reduce((acc, current, index) => {
+    if (current.state === "match") return acc;
+    if (!targetWord.includes(current.letter)) return acc;
 
-      return hasPartialCharacterMatches
-        ? ({ ...letterState, state: "partial" } as const)
-        : letterState;
-    }
-    return letterState;
-  });
+    const totalInstancesInWord = targetWord
+      .split("")
+      .filter((char) => char === current.letter).length;
+    const foundInstances = acc.filter(
+      (letterState) =>
+        letterState.letter === current.letter && letterState.state != "invalid"
+    ).length;
+
+    return foundInstances < totalInstancesInWord
+      ? [
+          ...acc.slice(0, index),
+          { ...current, state: "partial" } as const,
+          ...acc.slice(index + 1, acc.length),
+        ]
+      : acc;
+  }, states);
 
   return result;
 }
 
-type GameScore = 1 | 2 | 3 | 4 | 5 | 6;
+type GameScore = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 function simulateGame(targetWord: string) {
-  let guessCount = 0;
-  let invalidLetters = [] as string[];
-  let knownLetters = [] as KnownLetter[];
+  let guesses = [] as Guess[];
   let suggestions = initialSuggestions;
 
-  for (let x = 0; x < MAX_GUESSES; x++) {
-    guessCount++;
-
-    const guessResult = getGuessResult(targetWord, suggestions[0]);
-    const newState = getUpdatedGameState(
-      invalidLetters,
-      knownLetters,
-      guessResult
-    );
-
-    invalidLetters = newState.invalidLetters;
-    knownLetters = newState.knownLetters;
-
-    suggestions = getSuggestions(wordList, knownLetters, invalidLetters);
+  while (guesses.length < MAX_GUESSES) {
+    const guess = getGuessResult(targetWord, suggestions[0]);
+    guesses = [...guesses, guess];
+    suggestions = getSuggestions(suggestions, guesses);
 
     if (suggestions.length === 1) {
       break;
     }
+
+    if (suggestions.length === 0) {
+      throw new Error(
+        `Simulation failed for word: ${targetWord} on guess number ${guesses.length}. No suggestions found.`
+      );
+    }
+
+    if (guesses.length === MAX_GUESSES) {
+      throw new Error(
+        `Simulation failed for word: ${targetWord}. Exceeding max guesses.`
+      );
+    }
   }
 
-  return guessCount as GameScore;
+  return guesses.length as GameScore;
 }
 
 describe("simulation", () => {
   test("simulate all possible games", () => {
+    const t0 = performance.now();
     const results = wordList.map((word) => ({
       word,
       score: simulateGame(word),
     }));
-    const totalsSummary = results.reduce(
+    const summary = results.reduce(
       (acc, result) => ({
         ...acc,
         total: acc.total + result.score,
         [result.score]: acc[result.score] + 1,
       }),
-      { total: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 }
+      { total: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 }
     );
-    console.log("Summary:", totalsSummary);
-    console.log("All results:", results);
+    const t1 = performance.now();
+    console.log("Summary:", summary);
+    console.log("Duration:", t1 - t0);
   });
 });

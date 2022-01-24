@@ -1,5 +1,3 @@
-import { getSuggestions } from "../utils/suggestions";
-
 export const wordList = [
   "cigar",
   "rebut",

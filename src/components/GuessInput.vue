@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { KnownLetter, LetterState } from "../types/types";
+import { LetterState } from "../types/types";
 import LetterInput from "./LetterInput.vue";
 import LetterStateButtons from "./LetterStateButtons.vue";
 import { focusNext } from "../utils/focus";
-
-defineProps<{ knownLetters: KnownLetter[] }>();
 
 const defaultLetterState: LetterState = { letter: "", state: "invalid" };
 
@@ -65,31 +63,11 @@ watch(
 <template>
   <div class="mb-8">
     <div class="tile-row mb-2">
-      <LetterInput
-        v-model:letter-state="letter1State"
-        :known-letters="knownLetters"
-        :index="0"
-      />
-      <LetterInput
-        v-model:letter-state="letter2State"
-        :known-letters="knownLetters"
-        :index="1"
-      />
-      <LetterInput
-        v-model:letter-state="letter3State"
-        :known-letters="knownLetters"
-        :index="2"
-      />
-      <LetterInput
-        v-model:letter-state="letter4State"
-        :known-letters="knownLetters"
-        :index="3"
-      />
-      <LetterInput
-        v-model:letter-state="letter5State"
-        :known-letters="knownLetters"
-        :index="4"
-      />
+      <LetterInput v-model:letter-state="letter1State" :index="0" />
+      <LetterInput v-model:letter-state="letter2State" :index="1" />
+      <LetterInput v-model:letter-state="letter3State" :index="2" />
+      <LetterInput v-model:letter-state="letter4State" :index="3" />
+      <LetterInput v-model:letter-state="letter5State" :index="4" />
     </div>
 
     <div class="tile-row mb-4">

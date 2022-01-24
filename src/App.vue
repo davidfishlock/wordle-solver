@@ -2,52 +2,35 @@
 import GuessInput from "./components/GuessInput.vue";
 import GuessResult from "./components/GuessResult.vue";
 import Suggestions from "./components/Suggestions.vue";
-
-import { getUpdatedGameState } from "./utils/guess";
-import { wordList } from "./data/dictionary";
-import { KnownLetter, LetterState, Guess } from "./types/types";
+import { MAX_SUGGESTIONS_LENGTH } from "./constants";
+import { Guess } from "./types/types";
 import { ref } from "vue";
 import { getSuggestions, initialSuggestions } from "./utils/suggestions";
 
-const invalidLetters = ref([] as string[]);
-const knownLetters = ref([] as KnownLetter[]);
-const guessResults = ref([] as Guess[]);
+const guesses = ref([] as Guess[]);
 const suggestions = ref(initialSuggestions);
 
-const onGuessSubmit = (letterStates: LetterState[]) => {
-  const newState = getUpdatedGameState(
-    invalidLetters.value,
-    knownLetters.value,
-    letterStates
-  );
-  knownLetters.value = newState.knownLetters;
-  invalidLetters.value = newState.invalidLetters;
-  suggestions.value = getSuggestions(
-    wordList,
-    knownLetters.value,
-    invalidLetters.value
-  );
-  guessResults.value = [...guessResults.value, [...letterStates]];
+const onGuessSubmit = (guess: Guess) => {
+  guesses.value = [...guesses.value, guess];
+  suggestions.value = getSuggestions(suggestions.value, guesses.value);
 };
 
 const onReset = () => {
-  invalidLetters.value = [];
-  knownLetters.value = [];
-  guessResults.value = [];
+  guesses.value = [];
   suggestions.value = initialSuggestions;
 };
 </script>
 
 <template>
   <h1 class="mb-8">Wordle Solver</h1>
-  <ol v-if="guessResults.length" class="mb-8">
-    <li v-for="(result, index) in guessResults" :key="index">
+  <ol v-if="guesses.length" class="mb-8">
+    <li v-for="(result, index) in guesses" :key="index">
       <GuessResult :result="result" :number="index + 1" />
     </li>
   </ol>
   <div v-if="suggestions.length > 1">
-    <GuessInput :known-letters="knownLetters" @guess-submit="onGuessSubmit" />
-    <Suggestions :suggestions="suggestions" />
+    <GuessInput @guess-submit="onGuessSubmit" />
+    <Suggestions :suggestions="suggestions.slice(0, MAX_SUGGESTIONS_LENGTH)" />
   </div>
   <div v-else-if="suggestions.length === 1">
     <p class="mb-4">Yay! Today's word is {{ suggestions[0] }}.</p>
