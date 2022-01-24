@@ -3,10 +3,15 @@ import GuessInput from "./components/GuessInput.vue";
 import GuessResult from "./components/GuessResult.vue";
 import Suggestions from "./components/Suggestions.vue";
 
-import { getSuggestions, getUpdatedGameState } from "./utils/guess";
-import { initialSuggestions, wordList } from "./data/dictionary";
+import { getUpdatedGameState } from "./utils/guess";
+import { wordList } from "./data/dictionary";
 import { KnownLetter, LetterState } from "./types/letters";
 import { ref } from "vue";
+import {
+  generateWordScores,
+  getSuggestions,
+  initialSuggestions,
+} from "./utils/suggestions";
 
 const invalidLetters = ref([] as string[]);
 const knownLetters = ref([] as KnownLetter[]);
@@ -39,7 +44,6 @@ const onReset = () => {
 
 <template>
   <h1 class="mb-8">Wordle Solver</h1>
-
   <ol v-if="guessResults.length" class="mb-8">
     <li v-for="(result, index) in guessResults" :key="index">
       <GuessResult :result="result" :number="index + 1" />

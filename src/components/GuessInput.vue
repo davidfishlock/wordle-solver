@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { KnownLetter, LetterState } from "../types/letters";
 import LetterInput from "./LetterInput.vue";
 import LetterStateButtons from "./LetterStateButtons.vue";
+import { focusNext } from "../utils/focus";
 
 defineProps<{ knownLetters: KnownLetter[] }>();
 
@@ -42,6 +43,23 @@ const onSubmit = () => {
     letter5State.value =
       defaultLetterState;
 };
+
+watch(
+  () => {
+    return [
+      letter1State.value.letter,
+      letter2State.value.letter,
+      letter3State.value.letter,
+      letter4State.value.letter,
+    ];
+  },
+  (newValue, oldValue) => {
+    const oldFilledValues = oldValue.filter(letter => letter);
+    const newFilledValues = newValue.filter(letter => letter);
+    if (newFilledValues.length >= oldFilledValues.length) focusNext();
+  },
+  {}
+);
 </script>
 
 <template>
