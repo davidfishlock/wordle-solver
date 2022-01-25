@@ -1,17 +1,23 @@
 <script setup lang="ts">
+const emit = defineEmits<{
+  (e: "selected", word: string): void;
+}>();
+
 defineProps<{ suggestions: string[] }>();
+
+const onSelected = (word: string) => {
+  emit("selected", word);
+};
 </script>
 
 <template>
   <div>
     <h2 class="mb-2">Suggestions:</h2>
     <ol class="flex flex-wrap -m-1">
-      <li
-        v-for="(word, index) in suggestions"
-        :key="index"
-        class="bg-gray-700 px-2 py-1 rounded-md m-1"
-      >
-        {{ word }}
+      <li v-for="(word, index) in suggestions" :key="index">
+        <button class="suggestion-button" @click="onSelected(word)">
+          {{ word }}
+        </button>
       </li>
     </ol>
   </div>

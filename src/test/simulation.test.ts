@@ -58,8 +58,6 @@ function getGuessResult(targetWord: string, guessWord: string): Guess {
   return result;
 }
 
-type GameScore = 1 | 2 | 3 | 4 | 5 | 6 | 7;
-
 function simulateGame(targetWord: string) {
   let guesses = [] as Guess[];
   let suggestions = initialSuggestions;
@@ -86,7 +84,7 @@ function simulateGame(targetWord: string) {
     }
   }
 
-  return guesses.length as GameScore;
+  return guesses.length;
 }
 
 describe("simulation", () => {
@@ -100,9 +98,9 @@ describe("simulation", () => {
       (acc, result) => ({
         ...acc,
         total: acc.total + result.score,
-        [result.score]: acc[result.score] + 1,
+        [result.score]: acc[result.score] ? acc[result.score] + 1 : 1,
       }),
-      { total: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 }
+      { total: 0 } as Record<string, number>
     );
     const t1 = performance.now();
     console.log("Summary:", summary);

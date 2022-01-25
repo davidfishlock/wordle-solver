@@ -1,6 +1,5 @@
-export const VOWEL_SCORE_MULTIPLIER = 2;
+export const WORD_LENGTH = 5;
 export const EXACT_MATCH_MULTIPLIER = 2;
-
 export const MAX_SUGGESTIONS_LENGTH = 10;
 export const VOWELS = ["a", "e", "i", "o", "u"];
 export const CONSONANTS = [

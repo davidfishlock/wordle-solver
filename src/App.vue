@@ -2,21 +2,38 @@
 import GuessInput from "./components/GuessInput.vue";
 import GuessResult from "./components/GuessResult.vue";
 import Suggestions from "./components/Suggestions.vue";
-import { MAX_SUGGESTIONS_LENGTH } from "./constants";
+import { MAX_SUGGESTIONS_LENGTH, WORD_LENGTH } from "./constants";
 import { Guess } from "./types/types";
 import { ref } from "vue";
 import { getSuggestions, initialSuggestions } from "./utils/suggestions";
 
+const getInitialGuessState = () => {
+  return Array(WORD_LENGTH).fill({ letter: "", state: "invalid" });
+};
+
+const currentGuess = ref(getInitialGuessState());
 const guesses = ref([] as Guess[]);
 const suggestions = ref(initialSuggestions);
 
 const onGuessSubmit = (guess: Guess) => {
   guesses.value = [...guesses.value, guess];
+  currentGuess.value = getInitialGuessState();
   suggestions.value = getSuggestions(suggestions.value, guesses.value);
+};
+
+const onSuggestionSelected = (word: string) => {
+  currentGuess.value = [
+    { letter: word[0], state: "invalid" },
+    { letter: word[1], state: "invalid" },
+    { letter: word[2], state: "invalid" },
+    { letter: word[3], state: "invalid" },
+    { letter: word[4], state: "invalid" },
+  ];
 };
 
 const onReset = () => {
   guesses.value = [];
+  currentGuess.value = getInitialGuessState();
   suggestions.value = initialSuggestions;
 };
 </script>
@@ -29,8 +46,11 @@ const onReset = () => {
     </li>
   </ol>
   <div v-if="suggestions.length > 1">
-    <GuessInput @guess-submit="onGuessSubmit" />
-    <Suggestions :suggestions="suggestions.slice(0, MAX_SUGGESTIONS_LENGTH)" />
+    <GuessInput v-model:guess="currentGuess" @submit="onGuessSubmit" />
+    <Suggestions
+      :suggestions="suggestions.slice(0, MAX_SUGGESTIONS_LENGTH)"
+      @selected="onSuggestionSelected"
+    />
   </div>
   <div v-else-if="suggestions.length === 1">
     <p class="mb-4">Yay! Today's word is {{ suggestions[0] }}.</p>
