@@ -53,8 +53,8 @@
     @apply white-text bg-blue-500 hover:bg-blue-700 disabled:bg-blue-500 disabled:opacity-50 font-bold tracking-wide uppercase px-6 py-2 rounded-md flex flex-row items-center;
   }
 
-  .suggestion-button {
-    @apply bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded-md m-1;
+  .subtle-button {
+    @apply bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700 disabled:opacity-30 px-2 py-1 rounded-md;
   }
 
   .tile-row {

@@ -15,7 +15,7 @@ const onSelected = (word: string) => {
     <h2 class="mb-2">Suggestions:</h2>
     <ol class="flex flex-wrap -m-1">
       <li v-for="(word, index) in suggestions" :key="index">
-        <button class="suggestion-button" @click="onSelected(word)">
+        <button class="subtle-button m-1" @click="onSelected(word)">
           {{ word }}
         </button>
       </li>
