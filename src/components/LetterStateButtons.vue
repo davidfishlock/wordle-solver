@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { LetterState, MatchState } from "../types/types";
-import { toRefs } from "vue";
+import { MatchState } from "../types/types";
 
 const emit = defineEmits<{
-  (e: "update:letter-state", state: LetterState): void;
+  (e: "update:letter-state", letterIndex: number, state: MatchState): void;
 }>();
 
-const props = defineProps<{ letterState: LetterState }>();
-
-const { letterState } = toRefs(props);
+const props = defineProps<{ letterIndex: number; state: MatchState }>();
 
 const onMatchStateChanged = (state: MatchState) => {
-  emit("update:letter-state", { ...letterState.value, state });
+  emit("update:letter-state", props.letterIndex, state);
 };
 </script>
 

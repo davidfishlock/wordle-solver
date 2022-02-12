@@ -1,47 +1,71 @@
 <script setup lang="ts">
-import { computed, toRefs } from "vue";
-import { Guess } from "../types/types";
-import LetterInput from "./LetterInput.vue";
+import { Guess, MatchState } from "../types/types";
 import LetterStateButtons from "./LetterStateButtons.vue";
+import { replaceAt } from "../utils/array";
 
 const emit = defineEmits<{
   (e: "update:guess", guess: Guess): void;
-  (e: "submit", guess: Guess): void;
 }>();
 
 const props = defineProps<{
   guess: Guess;
 }>();
-const { guess } = toRefs(props);
 
-const canSubmit = computed(() => guess.value.every((entry) => entry.letter));
-
-const onSubmit = () => {
-  emit("submit", guess.value);
-};
+function onStateUpdated(letterIndex: number, state: MatchState) {
+  const updatedGuess = replaceAt(props.guess, letterIndex, {
+    letter: props.guess[letterIndex].letter,
+    state,
+  });
+  emit("update:guess", updatedGuess);
+}
 </script>
 
 <template>
-  <div class="mb-8">
+  <div>
     <div class="tile-row mb-2">
-      <LetterInput v-model:letter-state="guess[0]" />
-      <LetterInput v-model:letter-state="guess[1]" />
-      <LetterInput v-model:letter-state="guess[2]" />
-      <LetterInput v-model:letter-state="guess[3]" />
-      <LetterInput v-model:letter-state="guess[4]" />
+      <div
+        v-for="(letterState, index) in guess"
+        :key="index"
+        :class="[
+          {
+            invalid: letterState.state === 'invalid',
+            partial: letterState.state === 'partial',
+            match: letterState.state === 'match',
+          },
+          'tile',
+        ]"
+      >
+        {{ letterState.letter }}
+      </div>
     </div>
 
     <div class="tile-row mb-4">
-      <LetterStateButtons v-model:letter-state="guess[0]" />
-      <LetterStateButtons v-model:letter-state="guess[1]" />
-      <LetterStateButtons v-model:letter-state="guess[2]" />
-      <LetterStateButtons v-model:letter-state="guess[3]" />
-      <LetterStateButtons v-model:letter-state="guess[4]" />
+      <LetterStateButtons
+        :letter-index="0"
+        :state="guess[0].state"
+        @update:letter-state="onStateUpdated"
+      />
+      <LetterStateButtons
+        :letter-index="1"
+        :state="guess[1].state"
+        @update:letter-state="onStateUpdated"
+      />
+      <LetterStateButtons
+        :letter-index="2"
+        :state="guess[2].state"
+        @update:letter-state="onStateUpdated"
+      />
+      <LetterStateButtons
+        :letter-index="3"
+        :state="guess[3].state"
+        @update:letter-state="onStateUpdated"
+      />
+      <LetterStateButtons
+        :letter-index="4"
+        :state="guess[4].state"
+        @update:letter-state="onStateUpdated"
+      />
     </div>
-
-    <button class="default-button" :disabled="!canSubmit" @click="onSubmit">
-      Submit
-    </button>
   </div>
 </template>
 

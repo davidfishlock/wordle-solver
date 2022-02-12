@@ -22,5 +22,3 @@ defineProps<{ result: LetterState[] }>();
     </div>
   </div>
 </template>
-
-<style scoped></style>
