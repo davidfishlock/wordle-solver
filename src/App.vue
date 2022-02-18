@@ -77,7 +77,7 @@ function onReset() {
 <template>
   <div class="h-full mx-auto max-w-lg pt-6 sm:pt-8 pb-4 flex flex-col">
     <div class="flex-grow mx-6 sm:mx-8">
-      <h1 class="mb-6 sm:mb-10">Wordle Solver</h1>
+      <h1 class="mb-6 sm:mb-10">Squabble Solver</h1>
       <ol v-if="guesses.length" class="mb-6">
         <li v-for="(result, index) in guesses" :key="index">
           <GuessResult :result="result" :number="index + 1" />

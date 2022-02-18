@@ -1,6 +1,6 @@
 import { CONSONANTS, VOWELS, EXACT_MATCH_MULTIPLIER } from "../constants";
 import { Guess, LetterState, MatchState } from "../types/types";
-import { wordList } from "../data/dictionary";
+import {extendedWordList, wordList} from "../data/dictionary";
 
 const startingPositionInfo = {
   totalCount: 0,
@@ -14,7 +14,7 @@ type WordScore = {
   score: number;
 };
 
-export const initialSuggestions = getSuggestions(wordList, []);
+export const initialSuggestions = getSuggestions([...wordList, ...extendedWordList], []);
 
 function generateLetterScores(words: string[]) {
   const scores: Record<string, LetterPositionInfo> = {
