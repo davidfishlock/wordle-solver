@@ -1,5 +1,5 @@
 import { CONSONANTS, VOWELS, EXACT_MATCH_MULTIPLIER } from "../constants";
-import { Guess } from "../types/types";
+import { Guess, LetterState, MatchState } from "../types/types";
 import { wordList } from "../data/dictionary";
 
 const startingPositionInfo = {
@@ -100,4 +100,18 @@ export function getSuggestions(remainingWords: string[], guesses: Guess[]) {
   return generateWordScores(candidates)
     .sort((a, b) => b.score - a.score)
     .map((wordScore) => wordScore.word);
+}
+
+export function getKnownMatchState(
+  previousGuesses: Guess[],
+  letter: string,
+  position: number
+): MatchState {
+  return previousGuesses.reduce(
+    (acc, guess) =>
+      guess[position].letter === letter && guess[position].state !== "invalid"
+        ? guess[position].state
+        : acc,
+    "invalid" as MatchState
+  );
 }

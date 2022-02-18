@@ -6,7 +6,7 @@
 
 @layer base {
   html {
-    @apply h-full
+    @apply h-full;
   }
   body {
     @apply h-full default-text default-background overflow-y-hidden;

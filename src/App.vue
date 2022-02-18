@@ -6,7 +6,11 @@ import Keyboard from "./components/Keyboard.vue";
 import { MAX_SUGGESTIONS_LENGTH, WORD_LENGTH } from "./constants";
 import { Guess } from "./types/types";
 import { ref, watch } from "vue";
-import { getSuggestions, initialSuggestions } from "./utils/suggestions";
+import {
+  getKnownMatchState,
+  getSuggestions,
+  initialSuggestions,
+} from "./utils/suggestions";
 import { findLastIndex, replaceAt } from "./utils/array";
 
 const getInitialGuessState = () => {
@@ -34,6 +38,7 @@ function onAddLetter(letter: string) {
   currentGuess.value = replaceAt(currentGuess.value, newLetterIndex, {
     ...currentGuess.value[newLetterIndex],
     letter,
+    state: getKnownMatchState(guesses.value, letter, newLetterIndex),
   });
 }
 
@@ -42,6 +47,7 @@ function onRemoveLetter() {
   currentGuess.value = replaceAt(currentGuess.value, lastFilledIndex.value, {
     ...currentGuess.value[removedLetterIndex],
     letter: "",
+    state: "invalid",
   });
 }
 
@@ -53,11 +59,11 @@ function onGuessSubmit() {
 
 function onSuggestionSelected(word: string) {
   currentGuess.value = [
-    { letter: word[0], state: "invalid" },
-    { letter: word[1], state: "invalid" },
-    { letter: word[2], state: "invalid" },
-    { letter: word[3], state: "invalid" },
-    { letter: word[4], state: "invalid" },
+    { letter: word[0], state: getKnownMatchState(guesses.value, word[0], 0) },
+    { letter: word[1], state: getKnownMatchState(guesses.value, word[1], 1) },
+    { letter: word[2], state: getKnownMatchState(guesses.value, word[2], 2) },
+    { letter: word[3], state: getKnownMatchState(guesses.value, word[3], 3) },
+    { letter: word[4], state: getKnownMatchState(guesses.value, word[4], 4) },
   ];
 }
 
@@ -98,11 +104,12 @@ function onReset() {
     </div>
     <div class="mx-1">
       <Suggestions
-          v-if="suggestions.length > 1"
-          :suggestions="suggestions.slice(0, MAX_SUGGESTIONS_LENGTH)"
-          @selected="onSuggestionSelected"
+        v-if="suggestions.length > 1"
+        :suggestions="suggestions.slice(0, MAX_SUGGESTIONS_LENGTH)"
+        @selected="onSuggestionSelected"
       />
-      <Keyboard class="mt-4"
+      <Keyboard
+        class="mt-4"
         :last-filled-index="lastFilledIndex"
         @add-letter="onAddLetter"
         @remove-letter="onRemoveLetter"
