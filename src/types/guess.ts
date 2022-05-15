@@ -1,4 +1,8 @@
-export type MatchState = "invalid" | "partial" | "match";
+export enum MatchState {
+  Invalid,
+  Partial,
+  Match,
+}
 
 export type LetterState = {
   letter: string;

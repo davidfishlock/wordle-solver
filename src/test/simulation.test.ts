@@ -1,4 +1,4 @@
-import { Guess } from "../types/types";
+import { Guess, MatchState } from "../types/guess";
 import { getSuggestions, initialSuggestions } from "../utils/suggestions";
 import { wordList } from "../data/dictionary";
 
@@ -10,32 +10,16 @@ function getGuessResult(targetWord: string, guessWord: string): Guess {
   }
 
   // Initialize and apply exact matches
-  const states: Guess = [
-    {
-      letter: guessWord[0],
-      state: isExactMatch(targetWord, guessWord, 0) ? "match" : "invalid",
-    },
-    {
-      letter: guessWord[1],
-      state: isExactMatch(targetWord, guessWord, 1) ? "match" : "invalid",
-    },
-    {
-      letter: guessWord[2],
-      state: isExactMatch(targetWord, guessWord, 2) ? "match" : "invalid",
-    },
-    {
-      letter: guessWord[3],
-      state: isExactMatch(targetWord, guessWord, 3) ? "match" : "invalid",
-    },
-    {
-      letter: guessWord[4],
-      state: isExactMatch(targetWord, guessWord, 4) ? "match" : "invalid",
-    },
-  ];
+  const states: Guess = [...guessWord].map((letter, index) => ({
+    letter,
+    state: isExactMatch(targetWord, guessWord, index)
+      ? MatchState.Match
+      : MatchState.Invalid,
+  }));
 
   // calculate any partial matches
   const result = states.reduce((acc, current, index) => {
-    if (current.state === "match") return acc;
+    if (current.state === MatchState.Match) return acc;
     if (!targetWord.includes(current.letter)) return acc;
 
     const totalInstancesInWord = targetWord
@@ -43,13 +27,14 @@ function getGuessResult(targetWord: string, guessWord: string): Guess {
       .filter((char) => char === current.letter).length;
     const foundInstances = acc.filter(
       (letterState) =>
-        letterState.letter === current.letter && letterState.state != "invalid"
+        letterState.letter === current.letter &&
+        letterState.state != MatchState.Invalid
     ).length;
 
     return foundInstances < totalInstancesInWord
       ? [
           ...acc.slice(0, index),
-          { ...current, state: "partial" } as const,
+          { ...current, state: MatchState.Partial } as const,
           ...acc.slice(index + 1, acc.length),
         ]
       : acc;
@@ -103,6 +88,7 @@ describe("simulation", () => {
       { total: 0 } as Record<string, number>
     );
     const t1 = performance.now();
+
     console.log("Summary:", summary);
     console.log("Duration:", t1 - t0);
   });

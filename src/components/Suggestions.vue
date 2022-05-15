@@ -1,15 +1,3 @@
-<script setup lang="ts">
-const emit = defineEmits<{
-  (e: "selected", word: string): void;
-}>();
-
-defineProps<{ suggestions: string[] }>();
-
-const onSelected = (word: string) => {
-  emit("selected", word);
-};
-</script>
-
 <template>
   <div>
     <h2 class="mb-2">Suggested:</h2>
@@ -23,4 +11,14 @@ const onSelected = (word: string) => {
   </div>
 </template>
 
-<style scoped></style>
+<script setup lang="ts">
+const emit = defineEmits<{
+  (e: "selected", word: string): void;
+}>();
+
+defineProps<{ suggestions: string[] }>();
+
+const onSelected = (word: string) => {
+  emit("selected", word);
+};
+</script>

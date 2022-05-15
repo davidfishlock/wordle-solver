@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import { LetterState } from "../types/types";
-
-defineProps<{ result: LetterState[] }>();
-</script>
-
 <template>
   <div class="tile-row mb-2">
     <div
@@ -11,9 +5,9 @@ defineProps<{ result: LetterState[] }>();
       :key="index"
       :class="[
         {
-          invalid: letterState.state === 'invalid',
-          partial: letterState.state === 'partial',
-          match: letterState.state === 'match',
+          invalid: letterState.state === MatchState.Invalid,
+          partial: letterState.state === MatchState.Partial,
+          match: letterState.state === MatchState.Match,
         },
         'tile',
       ]"
@@ -22,3 +16,9 @@ defineProps<{ result: LetterState[] }>();
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { Guess, MatchState } from "../types/guess";
+
+defineProps<{ result: Guess }>();
+</script>

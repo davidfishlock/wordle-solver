@@ -1,58 +1,3 @@
-<script setup lang="ts">
-import { computed } from "vue";
-import { WORD_LENGTH } from "../constants";
-import useGlobalKeyDown from "../hooks/useGlobalKeyDown";
-
-useGlobalKeyDown(onKeyDown);
-
-const row1Letters = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"];
-const row2Letters = ["a", "s", "d", "f", "g", "h", "j", "k", "l"];
-const row3Letters = ["z", "x", "c", "v", "b", "n", "m"];
-
-const emit = defineEmits<{
-  (e: "add-letter", letter: string): void;
-  (e: "remove-letter"): void;
-  (e: "submit"): void;
-}>();
-
-const props = defineProps<{
-  lastFilledIndex: number;
-}>();
-
-const canSubmit = computed(() => props.lastFilledIndex === WORD_LENGTH - 1);
-const canDelete = computed(() => props.lastFilledIndex >= 0);
-const canAdd = computed(() => props.lastFilledIndex < WORD_LENGTH - 1);
-
-const onLetterPress = (letter: string) => {
-  emit("add-letter", letter);
-};
-
-const onDeletePress = () => {
-  emit("remove-letter");
-};
-
-const onSubmitPress = () => {
-  emit("submit");
-};
-
-function onKeyDown(event: KeyboardEvent) {
-  if (canSubmit.value && event.key === "Enter") {
-    onSubmitPress();
-    return;
-  }
-
-  if (canDelete.value && event.key === "Backspace") {
-    onDeletePress();
-    return;
-  }
-
-  if (canAdd.value && event.key.length === 1 && /[a-zA-Z]/.test(event.key)) {
-    onLetterPress(event.key);
-    return;
-  }
-}
-</script>
-
 <template>
   <div>
     <div class="keyboard-row">
@@ -104,6 +49,61 @@ function onKeyDown(event: KeyboardEvent) {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { WORD_LENGTH } from "../constants";
+import useGlobalKeyDown from "../hooks/useGlobalKeyDown";
+
+useGlobalKeyDown(onKeyDown);
+
+const row1Letters = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"];
+const row2Letters = ["a", "s", "d", "f", "g", "h", "j", "k", "l"];
+const row3Letters = ["z", "x", "c", "v", "b", "n", "m"];
+
+const emit = defineEmits<{
+  (e: "add-letter", letter: string): void;
+  (e: "remove-letter"): void;
+  (e: "submit"): void;
+}>();
+
+const props = defineProps<{
+  currentWordInput: string;
+}>();
+
+const canSubmit = computed(() => props.currentWordInput.length === WORD_LENGTH);
+const canDelete = computed(() => props.currentWordInput.length > 0);
+const canAdd = computed(() => props.currentWordInput.length < WORD_LENGTH);
+
+const onLetterPress = (letter: string) => {
+  emit("add-letter", letter);
+};
+
+const onDeletePress = () => {
+  emit("remove-letter");
+};
+
+const onSubmitPress = () => {
+  emit("submit");
+};
+
+function onKeyDown(event: KeyboardEvent) {
+  if (canSubmit.value && event.key === "Enter") {
+    onSubmitPress();
+    return;
+  }
+
+  if (canDelete.value && event.key === "Backspace") {
+    onDeletePress();
+    return;
+  }
+
+  if (canAdd.value && event.key.length === 1 && /[a-zA-Z]/.test(event.key)) {
+    onLetterPress(event.key);
+    return;
+  }
+}
+</script>
 
 <style scoped>
 .keyboard-row {

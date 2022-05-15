@@ -1,5 +1,5 @@
 import { CONSONANTS, VOWELS, EXACT_MATCH_MULTIPLIER } from "../constants";
-import { Guess, LetterState, MatchState } from "../types/types";
+import { Guess, MatchState } from "../types/guess";
 import { wordList } from "../data/dictionary";
 
 const startingPositionInfo = {
@@ -60,20 +60,24 @@ export function generateWordScores(words: string[]): WordScore[] {
 
 function isValidForGuess(word: string, guess: Guess) {
   for (const [index, letterState] of guess.entries()) {
-    if (letterState.state === "match" && word[index] !== letterState.letter) {
+    if (
+      letterState.state === MatchState.Match &&
+      word[index] !== letterState.letter
+    ) {
       return false;
     }
 
     const indicatedCharacterInstancesInGuess = guess.filter(
       (state) =>
-        state.letter === letterState.letter && state.state !== "invalid"
+        state.letter === letterState.letter &&
+        state.state !== MatchState.Invalid
     ).length;
     const characterInstancesInWord = word
       .split("")
       .filter((letter) => letter === letterState.letter).length;
 
     if (
-      letterState.state === "partial" &&
+      letterState.state === MatchState.Partial &&
       (word[index] === letterState.letter ||
         characterInstancesInWord < indicatedCharacterInstancesInGuess)
     ) {
@@ -81,7 +85,7 @@ function isValidForGuess(word: string, guess: Guess) {
     }
 
     if (
-      letterState.state === "invalid" &&
+      letterState.state === MatchState.Invalid &&
       (word[index] === letterState.letter ||
         characterInstancesInWord > indicatedCharacterInstancesInGuess)
     ) {
@@ -109,9 +113,10 @@ export function getKnownMatchState(
 ): MatchState {
   return previousGuesses.reduce(
     (acc, guess) =>
-      guess[position].letter === letter && guess[position].state !== "invalid"
+      guess[position].letter === letter &&
+      guess[position].state !== MatchState.Invalid
         ? guess[position].state
         : acc,
-    "invalid" as MatchState
+    MatchState.Invalid as MatchState
   );
 }
