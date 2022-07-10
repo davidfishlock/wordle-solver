@@ -3,7 +3,11 @@
     <h2 class="mb-2">Suggested:</h2>
     <ol class="flex flex-wrap -m-0.5">
       <li v-for="(word, index) in suggestions" :key="index">
-        <button class="subtle-button m-0.5" @click="onSelected(word)">
+        <button
+          class="subtle-button m-0.5"
+          @click="onSelected(word)"
+          @keydown.enter.stop
+        >
           {{ word }}
         </button>
       </li>

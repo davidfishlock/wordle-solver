@@ -3,14 +3,17 @@
     <button
       class="invalid w-1/3 aspect-square"
       @click="onMatchStateChanged(MatchState.Invalid)"
+      @keydown.enter.stop
     ></button>
     <button
       class="partial w-1/3 aspect-square"
       @click="onMatchStateChanged(MatchState.Partial)"
+      @keydown.enter.stop
     ></button>
     <button
       class="match w-1/3 aspect-square"
       @click="onMatchStateChanged(MatchState.Match)"
+      @keydown.enter.stop
     ></button>
   </div>
 </template>
